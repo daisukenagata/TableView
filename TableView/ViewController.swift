@@ -38,7 +38,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         cell.tableLabel.text = tex[indexPath.row]
         cell.tableLabel.sizeToFit()
         table.rowHeight = cell.tableLabel.frame.size.height >= 44 ? cell.tableLabel.frame.size.height : 44
-        cell.layoutIfNeeded()
         return cell
     }
 
