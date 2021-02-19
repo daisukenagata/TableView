@@ -1,6 +1,6 @@
 # TableView
 
-https://dbank0208.com/wp/2020/12/03/tableview_dynamic/
+https://dbank0208.com/2020/12/03/tableview_dynamic/
 
 
 <p align="center">
