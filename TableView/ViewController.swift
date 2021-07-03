@@ -7,11 +7,12 @@
 
 import UIKit
 
-class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
 
     @IBOutlet weak var table: UITableView!
-    
-    private let tex = ["1",
+    private var textField = UITextField()
+    private var rectHeight: CGFloat = 0
+    private var tex = ["1",
                        "22",
                        "333",
                        "444444444444444444444444444444444444444444",
@@ -26,6 +27,39 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         super.viewDidLoad()
         table.dataSource = self
         table.delegate = self
+        configureObserver()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        textField.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 44)
+        textField.delegate = self
+        view.addSubview(textField)
+        textField.becomeFirstResponder()
+    }
+
+    private func configureObserver() {
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillShowNotification(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleKeyboardWillHideNotification), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    @objc private func handleKeyboardWillShowNotification(_ notification: Notification?) {
+        guard let rect = (notification?.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {
+            return
+        }
+        rectHeight = rect.height
+        UIView.performWithoutAnimation {
+            table.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: rect.height, right: 0)
+            table.setNeedsDisplay()
+        }
+    }
+
+    @objc private func handleKeyboardWillHideNotification() {
+        UIView.performWithoutAnimation {
+            table.contentInset = .zero
+            table.setNeedsDisplay()
+        }
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -37,11 +71,26 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         cell.backLabel.sizeToFit()
         cell.backLabel.textColor = .clear
 
-        table.rowHeight = cell.tableLabel.frame.size.height >= 44 ? cell.tableLabel.frame.size.height : 44
+        table.rowHeight = cell.tableLabel.frame.size.height >= 100 ? cell.tableLabel.frame.size.height : 100
         return cell
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+        return tex.count
+    }
+
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if (editingStyle == .delete) {
+            tex.remove(at: indexPath.row)
+            tableView.beginUpdates()
+            tableView.deleteRows(at: [indexPath] , with: .fade)
+            UIView.performWithoutAnimation {
+                tableView.endUpdates()
+                DispatchQueue.main.async { [self] in
+                    tableView.reloadData()
+                    tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: rectHeight, right: 0)
+                }
+            }
+        }
     }
 }
