@@ -92,22 +92,28 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         return tex.count
     }
 
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if (editingStyle == .delete) {
-            tex.remove(at: indexPath.row)
-            deleatedLogic(tableView: tableView, indexPath: indexPath)
-        }
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        let removeAction = UIContextualAction(style: .normal,
+                                              title: "削除",
+                                              handler: { (action: UIContextualAction, view: UIView, success :(Bool) -> Void) in
+                                                self.tex.remove(at: indexPath.row)
+                                                self.deleatedLogic(tableView: tableView, indexPath: indexPath)
+                                                success(true)
+                                              })
+        removeAction.backgroundColor = .red
+        return UISwipeActionsConfiguration(actions: [removeAction])
     }
 
     private func deleatedLogic(tableView: UITableView, indexPath: IndexPath) {
         tableView.beginUpdates()
-        tableView.deleteRows(at: [indexPath] , with: .fade)
+        tableView.deleteRows(at: [indexPath] , with: .top)
         UIView.performWithoutAnimation {
             tableView.endUpdates()
-            DispatchQueue.main.async { [self] in
-                tableView.reloadData()
-                tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: rectHeight, right: 0)
-            }
+        }
+        DispatchQueue.main.async { [self] in
+            tableView.reloadData()
+            tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: rectHeight, right: 0)
         }
     }
 
