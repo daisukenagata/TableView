@@ -22,12 +22,17 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
                        "8888888888",
                        "999999999999",
                        "10"]
-
+    var addBtn: UIBarButtonItem!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         table.dataSource = self
         table.delegate = self
         configureObserver()
+
+        title = "Home"
+        addBtn = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(onClick))
+        self.navigationItem.rightBarButtonItem = addBtn
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -37,6 +42,14 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         textField.delegate = self
         view.addSubview(textField)
         textField.becomeFirstResponder()
+    }
+
+    @objc func onClick() {
+        tex.insert("0", at: 0)
+        DispatchQueue.main.async { [self] in
+            tex.append("123")
+        }
+        reloadLogic(tableView: table, indexPath: table.getIndexPathFor(tableView: table)!)
     }
 
     private func configureObserver() {
@@ -82,15 +95,39 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if (editingStyle == .delete) {
             tex.remove(at: indexPath.row)
-            tableView.beginUpdates()
-            tableView.deleteRows(at: [indexPath] , with: .fade)
-            UIView.performWithoutAnimation {
-                tableView.endUpdates()
-                DispatchQueue.main.async { [self] in
-                    tableView.reloadData()
-                    tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: rectHeight, right: 0)
-                }
+            deleatedLogic(tableView: tableView, indexPath: indexPath)
+        }
+    }
+
+    private func deleatedLogic(tableView: UITableView, indexPath: IndexPath) {
+        tableView.beginUpdates()
+        tableView.deleteRows(at: [indexPath] , with: .fade)
+        UIView.performWithoutAnimation {
+            tableView.endUpdates()
+            DispatchQueue.main.async { [self] in
+                tableView.reloadData()
+                tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: rectHeight, right: 0)
             }
         }
+    }
+
+    private func reloadLogic(tableView: UITableView, indexPath: IndexPath) {
+        tableView.beginUpdates()
+        tableView.insertRows(at: [indexPath] , with: .fade)
+        UIView.performWithoutAnimation {
+            tableView.endUpdates()
+            DispatchQueue.main.async { [self] in
+                tableView.reloadData()
+                tableView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: rectHeight, right: 0)
+            }
+        }
+    }
+}
+
+extension UITableView {
+    func getIndexPathFor(tableView: UITableView) -> IndexPath? {
+        let point = tableView.convert(tableView.bounds.origin, from: tableView)
+        let indexPath = tableView.indexPathForRow(at: point)
+        return indexPath
     }
 }
