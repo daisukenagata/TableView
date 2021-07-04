@@ -1,6 +1,2 @@
 # TableView
-
-
-https://user-images.githubusercontent.com/16457165/124380017-700e0f80-dcf5-11eb-945d-e527205cce08.mov
-
-
+https://user-images.githubusercontent.com/16457165/124380105-e6ab0d00-dcf5-11eb-8a83-b34af24c22f1.mov
