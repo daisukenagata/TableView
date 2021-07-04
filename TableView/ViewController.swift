@@ -95,7 +95,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
         let removeAction = UIContextualAction(style: .normal,
-                                              title: "削除",
+                                              title: "Delete",
                                               handler: { (action: UIContextualAction, view: UIView, success :(Bool) -> Void) in
                                                 self.tex.remove(at: indexPath.row)
                                                 self.deleatedLogic(tableView: tableView, indexPath: indexPath)
